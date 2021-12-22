@@ -2,13 +2,14 @@ package excel
 
 import (
 	"strings"
+	"time"
 
+	"github.com/victorjacobs/csv2ynab/model"
 	"github.com/victorjacobs/csv2ynab/util"
-	"github.com/victorjacobs/csv2ynab/ynab"
 	"github.com/xuri/excelize/v2"
 )
 
-func Convert(filePath string) ([]ynab.Transaction, error) {
+func Convert(filePath string) ([]model.Transaction, error) {
 	f, err := excelize.OpenFile(filePath)
 	if err != nil {
 		return nil, err
@@ -19,7 +20,7 @@ func Convert(filePath string) ([]ynab.Transaction, error) {
 		return nil, err
 	}
 
-	var transactions []ynab.Transaction
+	var transactions []model.Transaction
 	headerEncountered := false
 	for rows.Next() {
 		row, err := rows.Columns()
@@ -44,8 +45,13 @@ func Convert(filePath string) ([]ynab.Transaction, error) {
 			continue
 		}
 
-		transaction := ynab.Transaction{
-			Date:   row[0],
+		date, err := time.Parse("02/01/2006", row[0])
+		if err != nil {
+			return nil, err
+		}
+
+		transaction := model.Transaction{
+			Date:   date,
 			Payee:  sanitizePayee(row[1]),
 			Amount: util.SanitizeAmount(row[4]),
 		}

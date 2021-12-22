@@ -16,6 +16,10 @@ func SanitizeAmount(amount string) float64 {
 	cleanedString := reg.ReplaceAllString(amount, "")
 	cleanedString = strings.ReplaceAll(cleanedString, ",", ".")
 
+	if cleanedString == "" {
+		return 0
+	}
+
 	amountFloat, err := strconv.ParseFloat(cleanedString, 64)
 	if err != nil {
 		log.Printf("Failed float conversion: %v", err)

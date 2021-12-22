@@ -6,12 +6,13 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
+	"github.com/victorjacobs/csv2ynab/model"
 	"github.com/victorjacobs/csv2ynab/util"
-	"github.com/victorjacobs/csv2ynab/ynab"
 )
 
-func Convert(filePath string) ([]ynab.Transaction, error) {
+func Convert(filePath string) ([]model.Transaction, error) {
 	fileBytes, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, err
@@ -64,7 +65,7 @@ func Convert(filePath string) ([]ynab.Transaction, error) {
 		log.Fatal("File not valid")
 	}
 
-	var transactions []ynab.Transaction
+	var transactions []model.Transaction
 
 	for {
 		record, err := r.Read()
@@ -92,8 +93,13 @@ func Convert(filePath string) ([]ynab.Transaction, error) {
 			amount = inflow
 		}
 
-		transactions = append(transactions, ynab.Transaction{
-			Date:   record[dateIndex],
+		date, err := time.Parse("02/01/2006", record[dateIndex])
+		if err != nil {
+			return nil, err
+		}
+
+		transactions = append(transactions, model.Transaction{
+			Date:   date,
 			Payee:  strings.Title(strings.ToLower(payee)),
 			Amount: amount,
 			Memo:   record[memoIndex],
