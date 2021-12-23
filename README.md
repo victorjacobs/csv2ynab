@@ -5,6 +5,6 @@ Parses CSV and Excel files from some Belgian banks and either dumps them into a 
 ## Usage
 
 ```bash
-go install github.com/victorjacobs/csv2ynab
+go install github.com/victorjacobs/csv2ynab@latest
 csv2ynab -in export.csv
 ```
