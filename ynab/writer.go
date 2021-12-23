@@ -10,7 +10,11 @@ import (
 
 func Write(config config.Config, transactions []model.Transaction) error {
 	// Interactively ask the user which budget and account to import into
-	client := NewClient(config)
+	client, err := NewClient(config)
+	if err != nil {
+		return err
+	}
+
 	budgets, err := client.GetBudgets()
 	if err != nil {
 		return err

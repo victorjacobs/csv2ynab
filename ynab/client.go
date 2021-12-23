@@ -3,6 +3,7 @@ package ynab
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -17,10 +18,14 @@ type Client struct {
 	config config.Config
 }
 
-func NewClient(config config.Config) Client {
+func NewClient(config config.Config) (Client, error) {
+	if config.Ynab.ApiKey == "" {
+		return Client{}, errors.New("YNAB API key missing")
+	}
+
 	return Client{
 		config: config,
-	}
+	}, nil
 }
 
 func (c *Client) PostTransactions(budgetId string, accountId string, transactions []transaction) error {

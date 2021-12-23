@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -20,6 +21,10 @@ func Load() (Config, error) {
 	path := filepath.Join(dir, ".ynabrc")
 
 	contents, err := os.ReadFile(path)
+	if errors.Is(err, os.ErrNotExist) {
+		return config, nil
+	}
+
 	if err != nil {
 		return config, err
 	}
