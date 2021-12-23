@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/victorjacobs/csv2ynab/config"
@@ -34,8 +35,6 @@ func (c *Client) PostTransactions(budgetId string, accountId string, transaction
 		return err
 	}
 
-	fmt.Printf("%+v", string(requestBodyMarshalled))
-
 	req, err := c.createRequest("POST", url, requestBodyMarshalled)
 	if err != nil {
 		return err
@@ -46,11 +45,21 @@ func (c *Client) PostTransactions(budgetId string, accountId string, transaction
 		return err
 	}
 	defer resp.Body.Close()
-
-	fmt.Println("response Status:", resp.Status)
-	fmt.Println("response Headers:", resp.Header)
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println("response Body:", string(body))
+
+	if resp.StatusCode != 201 {
+		return fmt.Errorf("posting transactions returned status %v", resp.StatusCode)
+	}
+
+	response := postTransactionsResponse{}
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		return err
+	}
+
+	if len(response.Data.DuplicateImportIds) != 0 {
+		log.Printf("File contained %v duplicates", len(response.Data.DuplicateImportIds))
+	}
 
 	return nil
 }
@@ -70,6 +79,10 @@ func (c *Client) GetBudgets() ([]Budget, error) {
 	}
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
+
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("getting budgets returned status %v", resp.StatusCode)
+	}
 
 	response := getBudgetsResponse{}
 	err = json.Unmarshal(body, &response)
@@ -95,6 +108,10 @@ func (c *Client) GetAccounts(budgetId string) ([]Account, error) {
 	}
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
+
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("getting accounts returned status %v", resp.StatusCode)
+	}
 
 	response := getAccountsResponse{}
 	err = json.Unmarshal(body, &response)

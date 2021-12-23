@@ -41,6 +41,8 @@ func main() {
 		log.Fatalf("Input path %v not recognized", *filePath)
 	}
 
+	log.Printf("Parsed %v transactions", len(transactions))
+
 	if err != nil {
 		log.Fatal(err)
 	}

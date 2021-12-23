@@ -55,17 +55,17 @@ func Write(config config.Config, transactions []model.Transaction) error {
 
 	selectedAccount := accounts[i]
 
-	prompt = promptui.Select{
-		Label: "Have the transactions all cleared?",
-		Items: []string{"Yes", "No"},
-	}
+	// prompt = promptui.Select{
+	// 	Label: "Have the transactions all cleared?",
+	// 	Items: []string{"Yes", "No"},
+	// }
 
-	i, _, err = prompt.Run()
-	if err != nil {
-		return err
-	}
+	// i, _, err = prompt.Run()
+	// if err != nil {
+	// 	return err
+	// }
 
-	cleared := i == 0
+	// cleared := i == 0
 
 	confirm := promptui.Prompt{
 		Label:     fmt.Sprintf("Import transactions into %q account in %q", selectedAccount.Name, selectedBudget.Name),
@@ -84,7 +84,7 @@ func Write(config config.Config, transactions []model.Transaction) error {
 	// Convert transactions from internal representation to YNAB models
 	var transactionsForPost []transaction
 	for _, transaction := range transactions {
-		transactionsForPost = append(transactionsForPost, transactionFromModel(transaction, selectedAccount.Id, cleared))
+		transactionsForPost = append(transactionsForPost, transactionFromModel(transaction, selectedAccount.Id, false))
 	}
 
 	err = client.PostTransactions(selectedBudget.Id, selectedAccount.Id, transactionsForPost)

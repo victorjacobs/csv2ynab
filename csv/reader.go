@@ -2,8 +2,8 @@ package csv
 
 import (
 	"encoding/csv"
+	"errors"
 	"io"
-	"log"
 	"os"
 	"strings"
 	"time"
@@ -62,7 +62,7 @@ func Convert(filePath string) ([]model.Transaction, error) {
 	}
 
 	if dateIndex == -1 || payeeIndex == -1 || memoIndex == -1 || inflowIndex == -1 || outflowIndex == -1 {
-		log.Fatal("File not valid")
+		return nil, errors.New("input file not valid")
 	}
 
 	var transactions []model.Transaction

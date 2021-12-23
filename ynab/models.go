@@ -1,6 +1,12 @@
 package ynab
 
-import "github.com/victorjacobs/csv2ynab/model"
+import (
+	"crypto/sha1"
+	"encoding/base64"
+	"fmt"
+
+	"github.com/victorjacobs/csv2ynab/model"
+)
 
 // YNAB-specific version of a transaction
 type transaction struct {
@@ -30,7 +36,17 @@ func transactionFromModel(t model.Transaction, accountId string, cleared bool) t
 		Memo:      memo,
 		Amount:    amount,
 		AccountId: accountId,
+		ImportId:  generateImportId(t),
 	}
+}
+
+func generateImportId(t model.Transaction) string {
+	h := sha1.New()
+
+	hashKey := fmt.Sprintf("%v%v%v%v", t.Payee, t.Amount, t.Memo, t.Date)
+	h.Write([]byte(hashKey))
+
+	return base64.StdEncoding.EncodeToString(h.Sum(nil))
 }
 
 type Budget struct {
@@ -46,6 +62,14 @@ type Account struct {
 // Private models to parse API responses
 type postTransactionsRequest struct {
 	Transactions []transaction `json:"transactions"`
+}
+
+type postTransactionsResponse struct {
+	Data postTransactionsResponseData `json:"data"`
+}
+
+type postTransactionsResponseData struct {
+	DuplicateImportIds []string `json:"duplicate_import_ids"`
 }
 
 type getBudgetsResponse struct {
