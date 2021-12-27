@@ -42,8 +42,10 @@ type Budget struct {
 }
 
 type Account struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
+	Id      string `json:"id"`
+	Name    string `json:"name"`
+	Closed  bool   `json:"closed"`
+	Deleted bool   `json:"deleted"`
 }
 
 // Private models to parse API responses

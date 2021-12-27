@@ -23,7 +23,40 @@ func main() {
 	// Flags
 	filePath := flag.String("in", "", "path to input file [required]")
 	outputPath := flag.String("out", "", "path to output CSV to, if not set transactions will be sent through the YNAB API")
+	list := flag.Bool("list", false, "lists all budgets and accounts on the given API key")
 	flag.Parse()
+
+	if *list {
+		ynabClient, err := ynab.NewClient(config)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		budgets, err := ynabClient.GetBudgets()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		for _, budget := range budgets {
+			fmt.Printf("Budget %q (%v)\n", budget.Name, budget.Id)
+			accounts, err := ynabClient.GetAccounts(budget.Id)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			for _, account := range accounts {
+				if account.Deleted || account.Closed {
+					continue
+				}
+
+				fmt.Printf("\tAccount %q (%v)\n", account.Name, account.Id)
+			}
+
+			fmt.Print("\n")
+		}
+
+		return
+	}
 
 	if *filePath == "" {
 		fmt.Println("Error: Input path is required")
