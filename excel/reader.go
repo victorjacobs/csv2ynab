@@ -1,6 +1,7 @@
 package excel
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -22,6 +23,7 @@ func Convert(filePath string) ([]model.Transaction, error) {
 
 	var transactions []model.Transaction
 	headerEncountered := false
+	rowNumber := 0
 	for rows.Next() {
 		row, err := rows.Columns()
 		if err != nil {
@@ -40,6 +42,8 @@ func Convert(filePath string) ([]model.Transaction, error) {
 			continue
 		}
 
+		rowNumber += 1
+
 		// Skip the payment of the bill
 		if strings.HasPrefix(row[1], "BETALING VIA DOMICILIERIN") {
 			continue
@@ -51,9 +55,10 @@ func Convert(filePath string) ([]model.Transaction, error) {
 		}
 
 		transaction := model.Transaction{
-			Date:   date,
-			Payee:  sanitizePayee(row[1]),
-			Amount: util.SanitizeAmount(row[4]),
+			Date:           date,
+			Payee:          sanitizePayee(row[1]),
+			Amount:         util.SanitizeAmount(row[4]),
+			IdempotencyKey: fmt.Sprintf("%v", rowNumber),
 		}
 
 		transactions = append(transactions, transaction)

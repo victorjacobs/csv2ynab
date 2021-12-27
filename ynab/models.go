@@ -1,10 +1,6 @@
 package ynab
 
 import (
-	"crypto/sha1"
-	"encoding/base64"
-	"fmt"
-
 	"github.com/victorjacobs/csv2ynab/model"
 )
 
@@ -36,17 +32,8 @@ func transactionFromModel(t model.Transaction, accountId string, cleared bool) t
 		Memo:      memo,
 		Amount:    amount,
 		AccountId: accountId,
-		ImportId:  generateImportId(t),
+		ImportId:  t.ImportId(),
 	}
-}
-
-func generateImportId(t model.Transaction) string {
-	h := sha1.New()
-
-	hashKey := fmt.Sprintf("%v%v%v%v", t.Payee, t.Amount, t.Memo, t.Date)
-	h.Write([]byte(hashKey))
-
-	return base64.StdEncoding.EncodeToString(h.Sum(nil))
 }
 
 type Budget struct {
