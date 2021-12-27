@@ -8,16 +8,48 @@ import (
 	"github.com/victorjacobs/csv2ynab/model"
 )
 
-func Write(config config.Config, transactions []model.Transaction) error {
-	// Interactively ask the user which budget and account to import into
+func Write(config config.Ynab, transactions []model.Transaction) error {
+	var selectedBudget string
+	var selectedAccount string
+	var err error
+
 	client, err := NewClient(config)
 	if err != nil {
 		return err
 	}
 
-	budgets, err := client.GetBudgets()
+	if config.AccountId == "" || config.BudgetId == "" {
+		selectedBudget, selectedAccount, err = promptBudgetAndAccount(client)
+
+		if err != nil {
+			return err
+		} else if selectedBudget == "" || selectedAccount == "" {
+			return nil
+		}
+	} else {
+		selectedBudget = config.BudgetId
+		selectedAccount = config.AccountId
+	}
+
+	// Convert transactions from internal representation to YNAB models
+	var transactionsForPost []transaction
+	for _, transaction := range transactions {
+		transactionsForPost = append(transactionsForPost, transactionFromModel(transaction, selectedAccount, false))
+	}
+
+	err = client.PostTransactions(selectedBudget, selectedAccount, transactionsForPost)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func promptBudgetAndAccount(client Client) (string, string, error) {
+	// Interactively ask the user which budget and account to import into
+	budgets, err := client.GetBudgets()
+	if err != nil {
+		return "", "", err
 	}
 
 	var budgetNames []string
@@ -32,14 +64,14 @@ func Write(config config.Config, transactions []model.Transaction) error {
 
 	i, _, err := prompt.Run()
 	if err != nil {
-		return err
+		return "", "", err
 	}
 
 	selectedBudget := budgets[i]
 
 	accounts, err := client.GetAccounts(selectedBudget.Id)
 	if err != nil {
-		return err
+		return "", "", err
 	}
 
 	var accountNames []string
@@ -54,7 +86,7 @@ func Write(config config.Config, transactions []model.Transaction) error {
 
 	i, _, err = prompt.Run()
 	if err != nil {
-		return err
+		return "", "", err
 	}
 
 	selectedAccount := accounts[i]
@@ -78,23 +110,12 @@ func Write(config config.Config, transactions []model.Transaction) error {
 
 	result, err := confirm.Run()
 	if err != nil {
-		return err
+		return "", "", err
 	}
 
 	if result != "y" {
-		return nil
+		return "", "", nil
 	}
 
-	// Convert transactions from internal representation to YNAB models
-	var transactionsForPost []transaction
-	for _, transaction := range transactions {
-		transactionsForPost = append(transactionsForPost, transactionFromModel(transaction, selectedAccount.Id, false))
-	}
-
-	err = client.PostTransactions(selectedBudget.Id, selectedAccount.Id, transactionsForPost)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return selectedBudget.Id, selectedAccount.Id, nil
 }

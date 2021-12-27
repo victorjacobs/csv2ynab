@@ -15,11 +15,11 @@ import (
 const apiEndpoint = "https://api.youneedabudget.com/v1"
 
 type Client struct {
-	config config.Config
+	config config.Ynab
 }
 
-func NewClient(config config.Config) (Client, error) {
-	if config.Ynab.ApiKey == "" {
+func NewClient(config config.Ynab) (Client, error) {
+	if config.ApiKey == "" {
 		return Client{}, errors.New("YNAB API key missing")
 	}
 
@@ -134,7 +134,7 @@ func (c *Client) createRequest(method string, url string, json []byte) (*http.Re
 	}
 
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", c.config.Ynab.ApiKey))
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", c.config.ApiKey))
 
 	return req, nil
 }

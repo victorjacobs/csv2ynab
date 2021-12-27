@@ -3,6 +3,7 @@ module github.com/victorjacobs/csv2ynab
 go 1.17
 
 require (
+	github.com/fsnotify/fsnotify v1.5.1
 	github.com/manifoldco/promptui v0.9.0
 	github.com/xuri/excelize/v2 v2.4.1
 )

@@ -34,5 +34,35 @@ func Load() (Config, error) {
 		return config, err
 	}
 
+	if err := validate(config); err != nil {
+		return config, err
+	}
+
 	return config, nil
+}
+
+func validate(c Config) error {
+	for _, watchDirectory := range c.WatchDirectories {
+		if err := validateWatchDirectory(watchDirectory); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func validateWatchDirectory(d WatchDirectory) error {
+	if d.AccountId == "" {
+		return errors.New("account_id not set for watch_directory")
+	}
+
+	if d.Path == "" {
+		return errors.New("path not set for watch_directory")
+	}
+
+	if d.BudgetId == "" {
+		return errors.New("budget_id not set for watch_directory")
+	}
+
+	return nil
 }
