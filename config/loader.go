@@ -8,17 +8,22 @@ import (
 	"path/filepath"
 )
 
-func Load() (Config, error) {
+func Load(configPath string) (Config, error) {
 	config := Config{}
 
-	usr, err := user.Current()
-	if err != nil {
-		return config, err
+	var path string
+	if configPath == "" {
+		usr, err := user.Current()
+		if err != nil {
+			return config, err
+		}
+
+		dir := usr.HomeDir
+
+		path = filepath.Join(dir, ".ynabrc")
+	} else {
+		path = configPath
 	}
-
-	dir := usr.HomeDir
-
-	path := filepath.Join(dir, ".ynabrc")
 
 	contents, err := os.ReadFile(path)
 	if errors.Is(err, os.ErrNotExist) {
