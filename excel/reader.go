@@ -16,20 +16,15 @@ func Convert(filePath string) ([]model.Transaction, error) {
 		return nil, err
 	}
 
-	rows, err := f.Rows("Volgende uittreksel")
+	rows, err := f.GetRows("Volgende uittreksel")
 	if err != nil {
 		return nil, err
 	}
 
 	var transactions []model.Transaction
 	headerEncountered := false
-	rowNumber := 0
-	for rows.Next() {
-		row, err := rows.Columns()
-		if err != nil {
-			return nil, err
-		}
-
+	totalRows := len(rows)
+	for i, row := range rows {
 		if len(row) == 0 {
 			continue
 		}
@@ -41,8 +36,6 @@ func Convert(filePath string) ([]model.Transaction, error) {
 
 			continue
 		}
-
-		rowNumber += 1
 
 		// Skip the payment of the bill
 		if strings.HasPrefix(row[1], "BETALING VIA DOMICILIERIN") {
@@ -58,7 +51,7 @@ func Convert(filePath string) ([]model.Transaction, error) {
 			Date:           date,
 			Payee:          sanitizePayee(row[1]),
 			Amount:         util.SanitizeAmount(row[4]),
-			IdempotencyKey: fmt.Sprintf("%v", rowNumber),
+			IdempotencyKey: fmt.Sprintf("%v", totalRows-i),
 		}
 
 		transactions = append(transactions, transaction)
