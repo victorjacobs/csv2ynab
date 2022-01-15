@@ -1,10 +1,8 @@
 package command
 
 import (
-	"fmt"
 	"log"
 	"os"
-	"strings"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/victorjacobs/csv2ynab/config"
@@ -36,10 +34,6 @@ func WatchDirectories(config config.Config) {
 
 					fileName := event.Name
 
-					if strings.Contains(fileName, ".processed") {
-						continue
-					}
-
 					log.Printf("Processing new file %q", fileName)
 
 					err = ProcessFile(watchDir.Merge(config.Ynab), fileName, "")
@@ -49,9 +43,9 @@ func WatchDirectories(config config.Config) {
 						continue
 					}
 
-					err = os.Rename(fileName, fmt.Sprintf("%v.processed", fileName))
+					err = os.Remove(fileName)
 					if err != nil {
-						log.Printf("Moving processed file failed: %v", err)
+						log.Printf("Removing processed file failed: %v", err)
 					}
 				case err, ok := <-watcher.Errors:
 					if !ok {
