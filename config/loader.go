@@ -47,8 +47,12 @@ func Load(configPath string) (Config, error) {
 }
 
 func validate(c Config) error {
-	for _, watchDirectory := range c.WatchDirectories {
-		if err := validateWatchDirectory(watchDirectory); err != nil {
+	if c.Watch.Directory == "" {
+		return errors.New("path not set for watch")
+	}
+
+	for _, watchPattern := range c.Watch.Patterns {
+		if err := validateWatchPattern(watchPattern); err != nil {
 			return err
 		}
 	}
@@ -56,17 +60,17 @@ func validate(c Config) error {
 	return nil
 }
 
-func validateWatchDirectory(d WatchDirectory) error {
-	if d.AccountId == "" {
-		return errors.New("account_id not set for watch_directory")
+func validateWatchPattern(w WatchPattern) error {
+	if w.AccountId == "" {
+		return errors.New("account_id not set for pattern")
 	}
 
-	if d.Path == "" {
-		return errors.New("path not set for watch_directory")
+	if w.Pattern == "" {
+		return errors.New("pattern not set for pattern")
 	}
 
-	if d.BudgetId == "" {
-		return errors.New("budget_id not set for watch_directory")
+	if w.BudgetId == "" {
+		return errors.New("budget_id not set for pattern")
 	}
 
 	return nil

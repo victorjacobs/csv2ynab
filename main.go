@@ -30,7 +30,7 @@ func main() {
 	}
 
 	if *watch {
-		command.WatchDirectories(config)
+		command.Watch(config)
 		return
 	}
 
