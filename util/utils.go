@@ -8,7 +8,7 @@ import (
 )
 
 func SanitizeAmount(amount string) float64 {
-	reg, err := regexp.Compile("[^0-9-,]+")
+	reg, err := regexp.Compile("[^0-9-,.]+")
 	if err != nil {
 		panic(err)
 	}
@@ -26,4 +26,17 @@ func SanitizeAmount(amount string) float64 {
 	}
 
 	return amountFloat
+}
+
+func StringBetween(s, start, end string) (string, bool) {
+	split := strings.Split(s, start)
+	if len(split) < 2 {
+		return "", false
+	}
+	split = strings.Split(split[1], end)
+	if len(split) < 2 {
+		return "", false
+	}
+
+	return strings.TrimSpace(split[0]), true
 }
