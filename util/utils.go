@@ -8,12 +8,12 @@ import (
 )
 
 func SanitizeAmount(amount string) float64 {
-	reg, err := regexp.Compile("[^0-9-,.]+")
+	r, err := regexp.Compile("[^0-9-,.]+")
 	if err != nil {
 		panic(err)
 	}
 
-	cleanedString := reg.ReplaceAllString(amount, "")
+	cleanedString := r.ReplaceAllString(amount, "")
 	cleanedString = strings.ReplaceAll(cleanedString, ",", ".")
 
 	if cleanedString == "" {

@@ -26,7 +26,7 @@ func Write(outputPath string, transactions []model.Transaction) error {
 			transaction.Date.Format("02/01/2006"),
 			transaction.Payee,
 			fmt.Sprintf("%f", transaction.Amount),
-			transaction.Memo,
+			transaction.Description,
 		})
 	}
 

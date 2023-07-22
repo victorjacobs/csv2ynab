@@ -47,15 +47,15 @@ func Convert(filePath string) ([]model.Transaction, error) {
 	}
 
 	// Find indices for columns
-	columnIndices := columnIndices(header, dateColumns, payeeColums, memoColums, outflowColumns, inflowColumns, amountColumns)
+	columnIndices := columnIndices(header, dateColumns, payeeColums, descriptionColumns, outflowColumns, inflowColumns, amountColumns)
 	dateIndex := columnIndices[0]
 	payeeIndex := columnIndices[1]
-	memoIndex := columnIndices[2]
+	descriptionIndex := columnIndices[2]
 	outflowIndex := columnIndices[3]
 	inflowIndex := columnIndices[4]
 	amountIndex := columnIndices[5]
 
-	if dateIndex == -1 || payeeIndex == -1 || memoIndex == -1 {
+	if dateIndex == -1 || payeeIndex == -1 {
 		return nil, fmt.Errorf("input file not valid")
 	}
 
@@ -70,11 +70,15 @@ func Convert(filePath string) ([]model.Transaction, error) {
 			return nil, err
 		}
 
-		memo := record[memoIndex]
-
 		payee := strings.TrimSpace(record[payeeIndex])
-		if p, present := payeeFromMemo(memo); payee == "" && present {
-			payee = p
+
+		var description string
+		if descriptionIndex != -1 {
+			description = record[descriptionIndex]
+
+			if p, present := payeeFromDescription(description); payee == "" && present {
+				payee = p
+			}
 		}
 
 		var amount float64
@@ -97,10 +101,10 @@ func Convert(filePath string) ([]model.Transaction, error) {
 		}
 
 		transactions = append(transactions, model.Transaction{
-			Date:   date,
-			Payee:  caser.String(strings.ToLower(payee)),
-			Amount: amount,
-			Memo:   record[memoIndex],
+			Date:        date,
+			Payee:       caser.String(strings.ToLower(payee)),
+			Amount:      amount,
+			Description: description,
 		})
 	}
 
@@ -111,13 +115,16 @@ func parseDate(s string) (time.Time, error) {
 	if strings.Contains(s, "/") {
 		return time.Parse("02/01/2006", s)
 	} else if strings.Contains(s, "-") {
-		return time.Parse("2006-01-02", s)
+		// Remove time from the thing
+		dateTimeParts := strings.Split(s, " ")
+
+		return time.Parse("2006-01-02", dateTimeParts[0])
 	} else {
 		return time.Time{}, errors.New("failed to determine date format")
 	}
 }
 
-func payeeFromMemo(s string) (string, bool) {
+func payeeFromDescription(s string) (string, bool) {
 	if strings.Contains(s, "KBC-PLUSREKENING") {
 		return "KBC", true
 	}

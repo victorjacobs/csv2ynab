@@ -8,7 +8,7 @@ import (
 type transaction struct {
 	Date      string `json:"date"`
 	PayeeName string `json:"payee_name"`
-	Memo      string `json:"memo"`
+	Memo      string `json:"memo,omitempty"`
 	Amount    int    `json:"amount"`
 	AccountId string `json:"account_id"`
 	Cleared   string `json:"cleared,omitempty"`
@@ -16,14 +16,13 @@ type transaction struct {
 }
 
 func transactionFromModel(t model.Transaction, accountId string, cleared bool) transaction {
-	// TODO add cleared
 	amount := int(t.Amount * 1000)
 	date := t.Date.Format("2006-01-02")
 	var memo string
-	if len(t.Memo) > 200 {
-		memo = t.Memo[0:200]
+	if len(t.Description) > 200 {
+		memo = t.Description[0:200]
 	} else {
-		memo = t.Memo
+		memo = t.Description
 	}
 
 	return transaction{
