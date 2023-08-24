@@ -47,13 +47,14 @@ func Convert(filePath string) ([]model.Transaction, error) {
 	}
 
 	// Find indices for columns
-	columnIndices := columnIndices(header, dateColumns, payeeColums, descriptionColumns, outflowColumns, inflowColumns, amountColumns)
+	columnIndices := columnIndices(header, dateColumns, payeeColums, descriptionColumns, outflowColumns, inflowColumns, amountColumns, feeColumns)
 	dateIndex := columnIndices[0]
 	payeeIndex := columnIndices[1]
 	descriptionIndex := columnIndices[2]
 	outflowIndex := columnIndices[3]
 	inflowIndex := columnIndices[4]
 	amountIndex := columnIndices[5]
+	feeIndex := columnIndices[6]
 
 	if dateIndex == -1 || payeeIndex == -1 {
 		return nil, fmt.Errorf("input file not valid")
@@ -93,6 +94,11 @@ func Convert(filePath string) ([]model.Transaction, error) {
 			}
 		} else if amountIndex != -1 {
 			amount = util.SanitizeAmount(strings.TrimSpace(record[amountIndex]))
+		}
+
+		if feeIndex != -1 {
+			fee := util.SanitizeAmount(strings.TrimSpace(record[feeIndex]))
+			amount = amount - fee
 		}
 
 		date, err := parseDate(record[dateIndex])

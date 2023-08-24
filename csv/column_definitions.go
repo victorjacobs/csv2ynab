@@ -29,3 +29,7 @@ var amountColumns = []string{
 	"Amount (EUR)",
 	"Amount",
 }
+
+var feeColumns = []string{
+	"Fee",
+}
