@@ -16,9 +16,18 @@ func Convert(filePath string) ([]model.Transaction, error) {
 		return nil, err
 	}
 
-	rows, err := f.GetRows("Volgende uittreksel")
+	var rows [][]string
+
+	tabNames := []string{"Volgende uittreksel", "Next statement"}
+	for _, tabName := range tabNames {
+		rows, err = f.GetRows(tabName)
+		if err == nil {
+			break
+		}
+	}
+
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("did not find any of the following tabs in Excel file: %v", strings.Join(tabNames, ", "))
 	}
 
 	var transactions []model.Transaction
