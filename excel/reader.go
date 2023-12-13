@@ -39,7 +39,7 @@ func Convert(filePath string) ([]model.Transaction, error) {
 		}
 
 		if !headerEncountered {
-			if row[0] == "Datum" {
+			if row[0] == "Datum" || row[0] == "Date" {
 				headerEncountered = true
 			}
 
