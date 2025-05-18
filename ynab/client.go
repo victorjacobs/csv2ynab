@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"log"
+	"io"
 	"net/http"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/victorjacobs/csv2ynab/config"
 )
@@ -15,10 +16,10 @@ import (
 const apiEndpoint = "https://api.youneedabudget.com/v1"
 
 type Client struct {
-	config config.Ynab
+	config *config.YNAB
 }
 
-func NewClient(config config.Ynab) (Client, error) {
+func NewClient(config *config.YNAB) (Client, error) {
 	if config.ApiKey == "" {
 		return Client{}, errors.New("YNAB API key missing")
 	}
@@ -28,7 +29,7 @@ func NewClient(config config.Ynab) (Client, error) {
 	}, nil
 }
 
-func (c *Client) PostTransactions(budgetId string, accountId string, transactions []transaction) error {
+func (c *Client) PostTransactions(budgetId string, accountId string, transactions []*transaction) error {
 	client := &http.Client{}
 	url := fmt.Sprintf("%s/budgets/%s/transactions", apiEndpoint, budgetId)
 
@@ -50,7 +51,7 @@ func (c *Client) PostTransactions(budgetId string, accountId string, transaction
 		return err
 	}
 	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 
 	if resp.StatusCode != 201 {
 		return fmt.Errorf("posting transactions returned status %v", resp.StatusCode)
@@ -83,7 +84,7 @@ func (c *Client) GetBudgets() ([]Budget, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 
 	if resp.StatusCode != 200 {
 		return nil, fmt.Errorf("getting budgets returned status %v", resp.StatusCode)
@@ -112,7 +113,7 @@ func (c *Client) GetAccounts(budgetId string) ([]Account, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 
 	if resp.StatusCode != 200 {
 		return nil, fmt.Errorf("getting accounts returned status %v", resp.StatusCode)

@@ -1,10 +1,11 @@
 package util
 
 import (
-	"log"
 	"regexp"
 	"strconv"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func SanitizeAmount(amount string) float64 {

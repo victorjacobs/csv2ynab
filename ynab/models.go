@@ -15,7 +15,7 @@ type transaction struct {
 	ImportId  string `json:"import_id,omitempty"`
 }
 
-func transactionFromModel(t model.Transaction, accountId string, cleared bool) transaction {
+func transactionFromModel(t *model.Transaction, accountId string) *transaction {
 	amount := int(t.Amount * 1000)
 	date := t.Date.Format("2006-01-02")
 	var memo string
@@ -25,7 +25,7 @@ func transactionFromModel(t model.Transaction, accountId string, cleared bool) t
 		memo = t.Description
 	}
 
-	return transaction{
+	return &transaction{
 		Date:      date,
 		PayeeName: t.Payee,
 		Memo:      memo,
@@ -49,11 +49,11 @@ type Account struct {
 
 // Private models to parse API responses
 type postTransactionsRequest struct {
-	Transactions []transaction `json:"transactions"`
+	Transactions []*transaction `json:"transactions"`
 }
 
 type postTransactionsResponse struct {
-	Data postTransactionsResponseData `json:"data"`
+	Data *postTransactionsResponseData `json:"data"`
 }
 
 type postTransactionsResponseData struct {
@@ -61,7 +61,7 @@ type postTransactionsResponseData struct {
 }
 
 type getBudgetsResponse struct {
-	Data getBudgetsResponseData `json:"data"`
+	Data *getBudgetsResponseData `json:"data"`
 }
 
 type getBudgetsResponseData struct {
@@ -69,7 +69,7 @@ type getBudgetsResponseData struct {
 }
 
 type getAccountsResponse struct {
-	Data getAccountsResponseData `json:"data"`
+	Data *getAccountsResponseData `json:"data"`
 }
 
 type getAccountsResponseData struct {

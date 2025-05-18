@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"strings"
 	"time"
 
@@ -15,13 +14,8 @@ import (
 	"golang.org/x/text/language"
 )
 
-func Convert(filePath string) ([]model.Transaction, error) {
-	fileBytes, err := os.ReadFile(filePath)
-	if err != nil {
-		return nil, err
-	}
-
-	fileContents := string(fileBytes)
+func Convert(data []byte) ([]*model.Transaction, error) {
+	fileContents := string(data)
 
 	// Replace any \r with \n
 	fileContents = strings.ReplaceAll(fileContents, "\r", "\n")
@@ -61,7 +55,7 @@ func Convert(filePath string) ([]model.Transaction, error) {
 	}
 
 	caser := cases.Title(language.English)
-	var transactions []model.Transaction
+	var transactions []*model.Transaction
 
 	for {
 		record, err := csvReader.Read()
@@ -106,7 +100,7 @@ func Convert(filePath string) ([]model.Transaction, error) {
 			return nil, err
 		}
 
-		transactions = append(transactions, model.Transaction{
+		transactions = append(transactions, &model.Transaction{
 			Date:        date,
 			Payee:       caser.String(strings.ToLower(payee)),
 			Amount:      amount,

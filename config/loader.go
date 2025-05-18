@@ -60,7 +60,7 @@ func validate(c Config) error {
 	return nil
 }
 
-func validateWatchPattern(w WatchPattern) error {
+func validateWatchPattern(w *WatchPattern) error {
 	if w.AccountId == "" {
 		return errors.New("account_id not set for pattern")
 	}

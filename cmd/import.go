@@ -1,10 +1,7 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
-	"github.com/victorjacobs/csv2ynab/config"
 	"github.com/victorjacobs/csv2ynab/importer"
 )
 
@@ -14,22 +11,12 @@ var importCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		filePath := args[0]
-		outputPath, err := cmd.Flags().GetString("config")
+		outputPath, err := cmd.Flags().GetString("output")
 		if err != nil {
 			return err
 		}
 
-		configPath, err := rootCmd.PersistentFlags().GetString("config")
-		if err != nil {
-			return err
-		}
-
-		config, err := config.Load(configPath)
-		if err != nil {
-			return fmt.Errorf("failed to load config: %w", err)
-		}
-
-		return importer.ProcessFile(config.Ynab, filePath, outputPath)
+		return importer.ProcessFile(cfg.YNAB, filePath, outputPath)
 	},
 }
 

@@ -5,9 +5,11 @@ go 1.23
 require (
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/manifoldco/promptui v0.9.0
+	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.8.4
 	github.com/xuri/excelize/v2 v2.9.0
+	golang.org/x/net v0.34.0
 	golang.org/x/text v0.21.0
 )
 
@@ -23,7 +25,6 @@ require (
 	github.com/xuri/efp v0.0.0-20241211021726-c4e992084aa6 // indirect
 	github.com/xuri/nfp v0.0.0-20250111060730-82a408b9aa71 // indirect
 	golang.org/x/crypto v0.32.0 // indirect
-	golang.org/x/net v0.34.0 // indirect
 	golang.org/x/sys v0.29.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

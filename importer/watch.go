@@ -1,9 +1,9 @@
 package importer
 
 import (
-	"log"
 	"os"
-	"path/filepath"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/fsnotify/fsnotify"
 	cfg "github.com/victorjacobs/csv2ynab/config"
@@ -31,45 +31,28 @@ func Watch(config cfg.Config) {
 				}
 
 				fileName := event.Name
-				baseFileName := filepath.Base(fileName)
-				var matchedPattern *cfg.WatchPattern
 
-				for _, p := range config.Watch.Patterns {
-					match, err := filepath.Match(p.Pattern, baseFileName)
-					if err != nil {
-						log.Printf("Matching failed: %v", err)
-						continue
-					}
-
-					if match {
-						matchedPattern = &p
-						break
-					}
+				ynabConfig, err := config.YNABConfigForFile(fileName)
+				if err != nil {
+					log.Errorf("Failed to get YNAB config: %v", err)
 				}
 
-				if matchedPattern == nil {
+				log.Printf("Processing new file %v", fileName)
+
+				if err := ProcessFile(ynabConfig, fileName, ""); err != nil {
+					log.Errorf("Processing failed: %v", err)
 					continue
 				}
 
-				log.Printf("Processing new file %q", fileName)
-
-				err = ProcessFile(matchedPattern.Merge(config.Ynab), fileName, "")
-
-				if err != nil {
-					log.Printf("Processing failed: %v", err)
-					continue
-				}
-
-				err = os.Remove(fileName)
-				if err != nil {
-					log.Printf("Removing processed file failed: %v", err)
+				if err := os.Remove(fileName); err != nil {
+					log.Errorf("Removing processed file failed: %v", err)
 				}
 			case err, ok := <-watcher.Errors:
 				if !ok {
 					return
 				}
 
-				log.Printf("Watching failed: %v", err)
+				log.Errorf("Watching failed: %v", err)
 			}
 		}
 	}()

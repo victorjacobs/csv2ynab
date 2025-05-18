@@ -1,6 +1,7 @@
 package excel
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 	"time"
@@ -10,8 +11,8 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-func Convert(filePath string) ([]model.Transaction, error) {
-	f, err := excelize.OpenFile(filePath)
+func Convert(data []byte) ([]*model.Transaction, error) {
+	f, err := excelize.OpenReader(bytes.NewReader(data))
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +31,7 @@ func Convert(filePath string) ([]model.Transaction, error) {
 		return nil, fmt.Errorf("did not find any of the following tabs in Excel file: %v", strings.Join(tabNames, ", "))
 	}
 
-	var transactions []model.Transaction
+	var transactions []*model.Transaction
 	headerEncountered := false
 	totalRows := len(rows)
 	for i, row := range rows {
@@ -56,7 +57,7 @@ func Convert(filePath string) ([]model.Transaction, error) {
 			return nil, err
 		}
 
-		transaction := model.Transaction{
+		transaction := &model.Transaction{
 			Date:           date,
 			Payee:          sanitizePayee(row[1]),
 			Amount:         util.SanitizeAmount(row[4]),

@@ -10,7 +10,7 @@ import (
 	"github.com/victorjacobs/csv2ynab/model"
 )
 
-func Write(outputPath string, transactions []model.Transaction) error {
+func Write(outputPath string, transactions []*model.Transaction) error {
 	outputFile, err := os.Create(outputPath)
 	if err != nil {
 		return err

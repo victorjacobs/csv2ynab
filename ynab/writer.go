@@ -8,7 +8,7 @@ import (
 	"github.com/victorjacobs/csv2ynab/model"
 )
 
-func Write(config config.Ynab, transactions []model.Transaction) error {
+func Write(config *config.YNAB, transactions []*model.Transaction) error {
 	var selectedBudget string
 	var selectedAccount string
 	var err error
@@ -32,9 +32,9 @@ func Write(config config.Ynab, transactions []model.Transaction) error {
 	}
 
 	// Convert transactions from internal representation to YNAB models
-	var transactionsForPost []transaction
+	var transactionsForPost []*transaction
 	for _, transaction := range transactions {
-		transactionsForPost = append(transactionsForPost, transactionFromModel(transaction, selectedAccount, false))
+		transactionsForPost = append(transactionsForPost, transactionFromModel(transaction, selectedAccount))
 	}
 
 	err = client.PostTransactions(selectedBudget, selectedAccount, transactionsForPost)
