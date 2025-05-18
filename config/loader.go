@@ -47,10 +47,6 @@ func Load(configPath string) (Config, error) {
 }
 
 func validate(c Config) error {
-	if c.Watch.Directory == "" {
-		return errors.New("path not set for watch")
-	}
-
 	for _, watchPattern := range c.Watch.Patterns {
 		if err := validateWatchPattern(watchPattern); err != nil {
 			return err
