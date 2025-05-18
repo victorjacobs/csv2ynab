@@ -1,6 +1,7 @@
 package importer
 
 import (
+	"errors"
 	"os"
 
 	log "github.com/sirupsen/logrus"
@@ -9,7 +10,7 @@ import (
 	cfg "github.com/victorjacobs/csv2ynab/config"
 )
 
-func Watch(config cfg.Config) {
+func Watch(config cfg.Config) error {
 	done := make(chan bool)
 
 	watcher, err := fsnotify.NewWatcher()
@@ -57,6 +58,10 @@ func Watch(config cfg.Config) {
 		}
 	}()
 
+	if config.Watch.Directory == "" {
+		return errors.New("watch directory is not set")
+	}
+
 	log.Printf("Watching for new files in %q", config.Watch.Directory)
 	err = watcher.Add(config.Watch.Directory)
 	if err != nil {
@@ -64,4 +69,6 @@ func Watch(config cfg.Config) {
 	}
 
 	<-done
+
+	return nil
 }

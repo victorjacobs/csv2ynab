@@ -9,9 +9,7 @@ var watchCmd = &cobra.Command{
 	Use:   "watch",
 	Short: "Watches directories for files to import",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		importer.Watch(cfg)
-
-		return nil
+		return importer.Watch(cfg)
 	},
 }
 
