@@ -14,7 +14,7 @@ import (
 )
 
 // Serve serves a webdav server
-func Serve(cfg config.Config) {
+func Serve(listenAddr string, cfg config.Config) {
 	fs := NewFS(func(path string, contents []byte) {
 		if strings.HasPrefix(path, "._") {
 			return
@@ -46,6 +46,6 @@ func Serve(cfg config.Config) {
 	}
 
 	// Start the server
-	log.Println("WebDAV server is running on :8080")
-	log.Fatal(http.ListenAndServe(":8080", handler))
+	log.Printf("WebDAV server is running on %v\n", listenAddr)
+	log.Fatal(http.ListenAndServe(listenAddr, handler))
 }
