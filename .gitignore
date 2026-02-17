@@ -3,3 +3,4 @@ tmp/*
 .air.toml
 csv2ynab
 watch/*
+.direnv/
