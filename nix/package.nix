@@ -9,7 +9,7 @@ buildGo126Module {
 
   src = lib.cleanSource ../.;
 
-  vendorHash = "sha256-exXUfKjWOoZy/4FFLKR+LJ544EdEAkx4cDoagcHg0aw=";
+  vendorHash = "sha256-UhogdYYb+N2q2hbhu7XSbaqe7yZOTW4haL31n+Nt5K0=";
 
   meta = {
     description = "Import Belgian bank exports into YNAB";
