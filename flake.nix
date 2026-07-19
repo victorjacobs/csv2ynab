@@ -16,13 +16,33 @@
         pkgs = nixpkgs.legacyPackages.${system};
       in
       {
+        packages = rec {
+          csv2ynab = pkgs.callPackage ./nix/package.nix { };
+          default = csv2ynab;
+        };
+
+        apps.default =
+          flake-utils.lib.mkApp {
+            drv = self.packages.${system}.default;
+          }
+          // {
+            meta.description = "Import Belgian bank exports into YNAB";
+          };
+
         devShells.default = pkgs.mkShell {
-          buildInputs = with pkgs; [
+          packages = with pkgs; [
             go_1_26
             gopls
             gotools
+            nixfmt
           ];
         };
       }
-    );
+    )
+    // {
+      nixosModules = rec {
+        csv2ynab = import ./nix/module.nix;
+        default = csv2ynab;
+      };
+    };
 }

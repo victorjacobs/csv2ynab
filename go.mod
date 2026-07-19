@@ -1,6 +1,6 @@
 module github.com/victorjacobs/csv2ynab
 
-go 1.26.2
+go 1.26.0
 
 require (
 	github.com/fsnotify/fsnotify v1.10.0
