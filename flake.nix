@@ -31,7 +31,7 @@
 
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
-            go_1_26
+            go_1_27
             gopls
             gotools
             nixfmt

@@ -1,15 +1,15 @@
 {
   lib,
-  buildGo126Module,
+  buildGo127Module,
 }:
 
-buildGo126Module {
+buildGo127Module {
   pname = "csv2ynab";
   version = "0.0.1";
 
   src = lib.cleanSource ../.;
 
-  vendorHash = "sha256-UhogdYYb+N2q2hbhu7XSbaqe7yZOTW4haL31n+Nt5K0=";
+  vendorHash = "sha256-BfeuBLKKZg9jVcAg2uLlMrmsVfT3xUelUTOTH5NLgyY=";
 
   meta = {
     description = "Import Belgian bank exports into YNAB";
